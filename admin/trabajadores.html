@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de Administración · Clínica Dental</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<style>
+  :root {
+    --clinic-teal: #0f6b64;
+    --clinic-teal-dark: #0a4b46;
+    --clinic-mint: #e8f5f3;
+    --clinic-ink: #142524;
+    --clinic-line: #d8e6e4;
+  }
+  body {
+    background: #f6faf9;
+    color: var(--clinic-ink);
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  .sidebar {
+    background: var(--clinic-teal-dark);
+    min-height: 100vh;
+    color: #eafaf7;
+  }
+  .sidebar .brand { font-weight: 600; font-size: 1.1rem; letter-spacing: 0.2px; }
+  .sidebar .brand small { display: block; font-weight: 400; color: #9fd0c9; font-size: 0.78rem; margin-top: 2px; }
+  .sidebar .nav-link { color: #cdeae4; border-radius: 8px; margin-bottom: 4px; font-size: 0.94rem; }
+  .sidebar .nav-link.active { background: var(--clinic-teal); color: #fff; }
+  .sidebar .nav-link:hover:not(.active) { background: rgba(255,255,255,0.06); color: #fff; }
+  .topbar { background: #fff; border-bottom: 1px solid var(--clinic-line); }
+  .panel-card { background: #fff; border: 1px solid var(--clinic-line); border-radius: 12px; }
+  .table > :not(caption) > * > * { padding: 0.9rem 0.8rem; vertical-align: middle; }
+  thead.table-head { background: var(--clinic-mint); }
+  thead.table-head th { font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--clinic-teal-dark); font-weight: 600; border-bottom: none; }
+  .role-badge { font-size: 0.76rem; padding: 0.32rem 0.6rem; border-radius: 6px; font-weight: 600; }
+  .role-Administrador { background: #fdecea; color: #a33328; }
+  .role-Odontologo { background: #e8f5f3; color: #0f6b64; }
+  .role-Recepcion { background: #eef1fb; color: #3a4ba0; }
+  .role-Asistente { background: #fff6e5; color: #8a5a00; }
+  .btn-clinic { background: var(--clinic-teal); border-color: var(--clinic-teal); color: #fff; }
+  .btn-clinic:hover { background: var(--clinic-teal-dark); border-color: var(--clinic-teal-dark); color: #fff; }
+  .empty-state { padding: 3rem 1rem; text-align: center; color: #6b8b87; }
+  .avatar-circle { width: 36px; height: 36px; border-radius: 50%; background: var(--clinic-mint); color: var(--clinic-teal-dark); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.85rem; flex-shrink: 0; }
+  @media (max-width: 767.98px) { .sidebar { min-height: auto; } }
+</style>
+</head>
+<body>
+
+<div class="container-fluid">
+  <div class="row">
+
+    <nav class="col-12 col-md-3 col-lg-2 sidebar p-3 d-flex flex-column">
+      <div class="brand mb-4 px-2">
+        Clínica Dental
+        <small>Panel de administración</small>
+      </div>
+      <ul class="nav nav-pills flex-column">
+        <li class="nav-item"><a href="#" class="nav-link active"><i class="bi bi-people-fill me-2"></i>Trabajadores</a></li>
+        <li class="nav-item"><a href="#" class="nav-link"><i class="bi bi-calendar2-check me-2"></i>Citas</a></li>
+        <li class="nav-item"><a href="#" class="nav-link"><i class="bi bi-clipboard2-pulse me-2"></i>Pacientes</a></li>
+        <li class="nav-item"><a href="#" class="nav-link"><i class="bi bi-gear me-2"></i>Configuración</a></li>
+      </ul>
+    </nav>
+
+    <main class="col-12 col-md-9 col-lg-10 p-0">
+      <div class="topbar px-3 px-md-4 py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+          <h5 class="mb-0">Trabajadores</h5>
+          <small class="text-muted">Registra al personal y asigna su rol dentro del sistema</small>
+        </div>
+        <button class="btn btn-clinic" data-bs-toggle="modal" data-bs-target="#modalRegistrar">
+          <i class="bi bi-person-plus-fill me-1"></i> Registrar trabajador
+        </button>
+      </div>
+
+      <div class="p-3 p-md-4">
+        <div class="row g-3 mb-4">
+          <div class="col-6 col-lg-3">
+            <div class="panel-card p-3">
+              <div class="text-muted small">Total</div>
+              <div class="fs-4 fw-semibold" id="statTotal">0</div>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="panel-card p-3">
+              <div class="text-muted small">Odontólogos</div>
+              <div class="fs-4 fw-semibold" id="statOdontologo">0</div>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="panel-card p-3">
+              <div class="text-muted small">Recepción</div>
+              <div class="fs-4 fw-semibold" id="statRecepcion">0</div>
+            </div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="panel-card p-3">
+              <div class="text-muted small">Administradores</div>
+              <div class="fs-4 fw-semibold" id="statAdministrador">0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <div class="table-responsive">
+            <table class="table mb-0">
+              <thead class="table-head">
+                <tr>
+                  <th>Trabajador</th>
+                  <th>Correo</th>
+                  <th>Rol</th>
+                  <th class="text-end">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tablaTrabajadores"></tbody>
+            </table>
+          </div>
+          <div id="emptyState" class="empty-state d-none">
+            <i class="bi bi-people fs-2 d-block mb-2"></i>
+            Aún no hay trabajadores registrados.<br>Usa "Registrar trabajador" para agregar el primero.
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div class="modal fade" id="modalRegistrar" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="formRegistrar">
+        <div class="modal-header">
+          <h5 class="modal-title">Registrar trabajador</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Nombre completo</label>
+            <input type="text" class="form-control" id="inputNombre" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Correo electrónico</label>
+            <input type="email" class="form-control" id="inputCorreo" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Rol dentro del sistema</label>
+            <select class="form-select" id="inputRol" required>
+              <option value="" disabled selected>Selecciona un rol</option>
+              <option value="Administrador">Administrador</option>
+              <option value="Odontologo">Odontólogo</option>
+              <option value="Recepcion">Recepción</option>
+              <option value="Asistente">Asistente</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-clinic">Registrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalEliminar" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Eliminar trabajador</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        ¿Seguro que quieres eliminar a <strong id="nombreAEliminar"></strong> del sistema? Esta acción no se puede deshacer.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="btnConfirmarEliminar">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+<script>
+  let trabajadores = [
+    { id: 1, nombre: "Adriana López", correo: "adriana@clinicadental.com", rol: "Administrador" },
+    { id: 2, nombre: "Carlos Ramírez", correo: "carlos@clinicadental.com", rol: "Odontologo" },
+    { id: 3, nombre: "Fernanda Ruiz", correo: "fernanda@clinicadental.com", rol: "Recepcion" }
+  ];
+  let siguienteId = 4;
+  let idAEliminar = null;
+
+  const tabla = document.getElementById("tablaTrabajadores");
+  const emptyState = document.getElementById("emptyState");
+  const form = document.getElementById("formRegistrar");
+  const modalRegistrar = new bootstrap.Modal(document.getElementById("modalRegistrar"));
+  const modalEliminar = new bootstrap.Modal(document.getElementById("modalEliminar"));
+
+  function iniciales(nombre) {
+    return nombre.split(" ").filter(Boolean).slice(0, 2).map(p => p[0].toUpperCase()).join("");
+  }
+
+  function renderTrabajadores() {
+    tabla.innerHTML = "";
+
+    if (trabajadores.length === 0) {
+      emptyState.classList.remove("d-none");
+    } else {
+      emptyState.classList.add("d-none");
+    }
+
+    trabajadores.forEach(t => {
+      const fila = document.createElement("tr");
+      fila.innerHTML = `
+        <td>
+          <div class="d-flex align-items-center gap-2">
+            <div class="avatar-circle">${iniciales(t.nombre)}</div>
+            <span>${t.nombre}</span>
+          </div>
+        </td>
+        <td class="text-muted">${t.correo}</td>
+        <td>
+          <select class="form-select form-select-sm role-select role-badge role-${t.rol}" data-id="${t.id}" style="width:auto;">
+            <option value="Administrador" ${t.rol === "Administrador" ? "selected" : ""}>Administrador</option>
+            <option value="Odontologo" ${t.rol === "Odontologo" ? "selected" : ""}>Odontólogo</option>
+            <option value="Recepcion" ${t.rol === "Recepcion" ? "selected" : ""}>Recepción</option>
+            <option value="Asistente" ${t.rol === "Asistente" ? "selected" : ""}>Asistente</option>
+          </select>
+        </td>
+        <td class="text-end">
+          <button class="btn btn-sm btn-outline-danger btn-eliminar" data-id="${t.id}" data-nombre="${t.nombre}">
+            <i class="bi bi-trash3"></i>
+          </button>
+        </td>
+      `;
+      tabla.appendChild(fila);
+    });
+
+    actualizarStats();
+    document.querySelectorAll(".role-select").forEach(sel => sel.addEventListener("change", cambiarRol));
+    document.querySelectorAll(".btn-eliminar").forEach(btn => btn.addEventListener("click", pedirConfirmacionEliminar));
+  }
+
+  function actualizarStats() {
+    document.getElementById("statTotal").textContent = trabajadores.length;
+    document.getElementById("statOdontologo").textContent = trabajadores.filter(t => t.rol === "Odontologo").length;
+    document.getElementById("statRecepcion").textContent = trabajadores.filter(t => t.rol === "Recepcion").length;
+    document.getElementById("statAdministrador").textContent = trabajadores.filter(t => t.rol === "Administrador").length;
+  }
+
+  function cambiarRol(e) {
+    const id = Number(e.target.dataset.id);
+    const nuevoRol = e.target.value;
+    const trabajador = trabajadores.find(t => t.id === id);
+    if (trabajador) {
+      trabajador.rol = nuevoRol;
+      renderTrabajadores();
+    }
+  }
+
+  function pedirConfirmacionEliminar(e) {
+    idAEliminar = Number(e.currentTarget.dataset.id);
+    document.getElementById("nombreAEliminar").textContent = e.currentTarget.dataset.nombre;
+    modalEliminar.show();
+  }
+
+  document.getElementById("btnConfirmarEliminar").addEventListener("click", () => {
+    trabajadores = trabajadores.filter(t => t.id !== idAEliminar);
+    idAEliminar = null;
+    modalEliminar.hide();
+    renderTrabajadores();
+  });
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const nombre = document.getElementById("inputNombre").value.trim();
+    const correo = document.getElementById("inputCorreo").value.trim();
+    const rol = document.getElementById("inputRol").value;
+
+    if (!nombre || !correo || !rol) return;
+
+    trabajadores.push({ id: siguienteId++, nombre, correo, rol });
+
+    form.reset();
+    modalRegistrar.hide();
+    renderTrabajadores();
+  });
+
+  renderTrabajadores();
+</script>
+</body>
+</html>
