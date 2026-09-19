@@ -1,0 +1,84 @@
+<?php
+// TODO (equipo backend): aquí se recibirá el resultado del registro
+// para mostrar mensaje de éxito o error, por ejemplo mediante $_GET o una sesión.
+$mensaje = $_GET['mensaje'] ?? '';
+$tipo = $_GET['tipo'] ?? '';
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registrar trabajador · Clínica Dental</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<style>
+  :root {
+    --clinic-teal: #0f6b64;
+    --clinic-teal-dark: #0a4b46;
+    --clinic-mint: #e8f5f3;
+    --clinic-ink: #142524;
+    --clinic-line: #d8e6e4;
+  }
+  body {
+    background: #f6faf9;
+    color: var(--clinic-ink);
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+  }
+  .topbar { background: #fff; border-bottom: 1px solid var(--clinic-line); }
+  .topbar a { color: var(--clinic-teal-dark); text-decoration: none; font-weight: 500; }
+  .topbar a:hover { color: var(--clinic-teal); }
+  .form-card { background: #fff; border: 1px solid var(--clinic-line); border-radius: 14px; max-width: 560px; }
+  .form-card .card-header-custom { background: var(--clinic-mint); border-bottom: 1px solid var(--clinic-line); border-radius: 14px 14px 0 0; padding: 1.25rem 1.5rem; }
+  .form-card .card-header-custom h5 { color: var(--clinic-teal-dark); margin-bottom: 2px; }
+  .btn-clinic { background: var(--clinic-teal); border-color: var(--clinic-teal); color: #fff; }
+  .btn-clinic:hover { background: var(--clinic-teal-dark); border-color: var(--clinic-teal-dark); color: #fff; }
+  .form-label { font-weight: 500; font-size: 0.92rem; }
+</style>
+</head>
+<body>
+
+<div class="topbar px-3 px-md-4 py-3">
+  <a href="trabajadores.html"><i class="bi bi-arrow-left me-1"></i> Volver a Trabajadores</a>
+</div>
+
+<div class="d-flex justify-content-center p-3 p-md-5">
+  <div class="form-card w-100">
+    <div class="card-header-custom">
+      <h5>Registrar trabajador</h5>
+      <small class="text-muted">Completa los datos para agregarlo al sistema</small>
+    </div>
+
+    <div class="card-body p-4">
+
+      <?php if ($mensaje): ?>
+        <div class="alert alert-<?= $tipo === 'exito' ? 'success' : 'danger' ?>">
+          <i class="bi bi-<?= $tipo === 'exito' ? 'check-circle-fill' : 'exclamation-triangle-fill' ?> me-1"></i>
+          <?= htmlspecialchars($mensaje) ?>
+        </div>
+      <?php endif; ?>
+
+      <!--
+        TODO (equipo backend): este formulario envía por POST a procesar_registro.php,
+        que aún no existe. Ahí se debe validar, conectar a la BD e insertar el registro.
+      -->
+      <form action="procesar_registro.php" method="POST" novalidate>
+        <div class="mb-3">
+          <label class="form-label" for="inputNombre">Nombre completo</label>
+          <input type="text" class="form-control" id="inputNombre" name="nombre" placeholder="Ej. Ana Torres" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="inputCorreo">Correo electrónico</label>
+          <input type="email" class="form-control" id="inputCorreo" name="correo" placeholder="ejemplo@clinicadental.com" required>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label" for="inputRol">Rol dentro del sistema</label>
+          <select class="form-select" id="inputRol" name="rol" required>
+            <option value="" disabled selected>Selecciona un rol</option>
+            <option value="Administrador">Administrador</option>
+            <option value="Odontologo">Odontólogo</option>
+            <option value="Recepcion">Recepción</option>
+            <option
